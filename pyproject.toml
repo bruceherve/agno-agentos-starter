@@ -1,0 +1,23 @@
+[build-system]
+requires = ["hatchling>=1.27.0"]
+build-backend = "hatchling.build"
+
+[project]
+name = "agno-agentos-starter"
+version = "0.1.0"
+description = "Starter template for building an Agno AgentOS backend"
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = [
+    "agno>=2.6.5",
+    "fastapi[standard]>=0.115.0",
+    "openai>=2.0.0",
+    "pgvector>=0.4.0",
+    "psycopg[binary]>=3.2.0",
+    "python-dotenv>=1.0.1",
+    "sqlalchemy>=2.0.0",
+    "uvicorn>=0.34.0",
+]
+
+[tool.hatch.build.targets.wheel]
+packages = ["app", "agents", "db"]

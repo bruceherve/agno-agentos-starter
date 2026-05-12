@@ -1,0 +1,6 @@
+chat:
+  quick_prompts:
+    starter-agent:
+      - "Explain what this AgentOS starter provides."
+      - "Give me a plan for adding a second agent to this platform."
+      - "Summarize the role of DB_URI, AGENTOS_URL, and JWT_VERIFICATION_KEY."

@@ -1,0 +1,66 @@
+replicaCount: 1
+
+image:
+  repository: agno-agentos-starter
+  pullPolicy: IfNotPresent
+  tag: latest
+
+serviceAccount:
+  create: true
+  annotations: {}
+  name: ""
+
+podAnnotations: {}
+
+podSecurityContext: {}
+
+securityContext: {}
+
+service:
+  type: ClusterIP
+  port: 8000
+
+ingress:
+  enabled: false
+  className: ""
+  annotations: {}
+  hosts:
+    - host: agno-agentos-starter.local
+      paths:
+        - path: /
+          pathType: Prefix
+  tls: []
+
+env:
+  RUNTIME_ENV: dev
+  AGENTOS_URL: http://127.0.0.1:8000
+  PORT: "8000"
+
+secretEnv:
+  MODEL_API_KEY: ""
+  DB_URI: ""
+  JWT_VERIFICATION_KEY: ""
+
+existingSecretName: ""
+
+resources: {}
+
+livenessProbe:
+  httpGet:
+    path: /health
+    port: http
+  initialDelaySeconds: 10
+  periodSeconds: 15
+
+readinessProbe:
+  httpGet:
+    path: /health
+    port: http
+  initialDelaySeconds: 5
+  periodSeconds: 10
+
+nodeSelector: {}
+
+tolerations: []
+
+affinity: {}
