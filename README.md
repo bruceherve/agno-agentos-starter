@@ -73,6 +73,8 @@ DB_URI=postgresql+psycopg://user:password@localhost:5432/agentos
 
 The model provider and model ID are configured in code, not in `.env`. The environment file only carries credentials and runtime connection data. In production, the same values should normally come from Kubernetes or your platform secret store rather than a committed env file.
 
+By default, this starter runs with `RUNTIME_ENV=dev`, so AgentOS token-based authorization is disabled for local development. When you switch to `RUNTIME_ENV=prd`, authorization is enabled by default. In that mode, `JWT_VERIFICATION_KEY` must be set or the app will refuse to serve production traffic.
+
 Postgres is the only real infrastructure dependency assumed by this starter because the included knowledge helper uses `pgvector`. Agno supports other storage patterns and backends as well, so if you want to change that layer, check the Agno storage and database documentation before extending `db/session.py`.
 
 ### 3. Run locally with Python
@@ -143,10 +145,10 @@ Only the variables used by this starter are documented here. The only required v
 |---|---|---|---|
 | `MODEL_API_KEY` | yes | none | API key for whichever model provider is configured in `app/settings.py`. |
 | `DB_URI` | yes | none | SQLAlchemy-style PostgreSQL connection string. |
-| `RUNTIME_ENV` | no | `dev` | `prd` enables AgentOS authorization. |
+| `RUNTIME_ENV` | no | `dev` | `dev` disables JWT auth for local development. `prd` enables AgentOS authorization. |
 | `AGENTOS_URL` | no | `http://127.0.0.1:8000` | Base URL used by the AgentOS scheduler. |
 | `PORT` | no | `8000` | Port for the API server. |
-| `JWT_VERIFICATION_KEY` | only in `prd` | none | Public verification key from `os.agno.com` when authorization is enabled. |
+| `JWT_VERIFICATION_KEY` | only in `prd` | none | Public verification key from `os.agno.com`. Required in production when `RUNTIME_ENV=prd`, otherwise the app will refuse to serve traffic. |
 
 ## Adding agents
 
@@ -157,5 +159,5 @@ Add a new module under `agents/` and register it in `agents/registry.py`. Then a
 - AgentOS is exposed through FastAPI via `app/main.py`.
 - The default model choice lives in `app/settings.py`, not in environment variables.
 - Scheduler support is enabled.
-- Authorization is enabled automatically when `RUNTIME_ENV=prd`.
+- Authorization is disabled by default in `dev` and enabled automatically when `RUNTIME_ENV=prd`.
 - The starter does not add a custom `/health` route to avoid colliding with AgentOS health handling.
