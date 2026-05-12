@@ -32,6 +32,18 @@ example.env
 
 ## Install and use
 
+### 0. Install `uv`
+
+If you plan to use the local Python workflow in this repo, install `uv` first:
+
+```bash
+curl -LsSf https://astral.sh/uv/install.sh | sh
+```
+
+This starter includes a committed `uv.lock`, so the expected local setup flow is `uv sync` from the repo root.
+
+If you only plan to build and run the Docker image, `uv` is not required on the host.
+
 ### 1. Clone the repository
 
 ```bash
@@ -67,15 +79,14 @@ Postgres is the only real infrastructure dependency assumed by this starter beca
 
 Prerequisites:
 
+- `uv`
 - Python 3.12+
 - A reachable database for `DB_URI`
 
-Create a virtual environment and install dependencies:
+Create the local environment and install the locked dependencies:
 
 ```bash
-uv venv
-source .venv/bin/activate
-uv pip install -e .
+uv sync
 ```
 
 Start the AgentOS backend:
