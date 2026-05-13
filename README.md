@@ -77,6 +77,8 @@ By default, this starter runs with `RUNTIME_ENV=dev`, so AgentOS token-based aut
 
 Postgres is the only real infrastructure dependency assumed by this starter because the included knowledge helper uses `pgvector`. Agno supports other storage patterns and backends as well, so if you want to change that layer, check the Agno storage and database documentation before extending `db/session.py`.
 
+If you want a Postgres-compatible alternative to vanilla Postgres, Neon also fits this starter because Agno supports Neon through the same `PostgresDb` path. In practice, that means you can point `DB_URI` at a Neon Postgres connection string and keep the rest of this starter unchanged.
+
 ### 3. Run locally with Python
 
 Prerequisites:
