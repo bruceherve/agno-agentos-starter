@@ -1,6 +1,6 @@
 apiVersion: v2
-name: agno-agentos-starter
-description: Helm chart for deploying the Agno AgentOS starter backend
+name: agno-agentic-platform-starter
+description: Helm chart for the Agno Agentic Platform Starter — backend and frontend
 type: application
 version: 0.1.0
-appVersion: "0.1.0"
+appVersion: "1.2.0"

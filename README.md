@@ -137,7 +137,7 @@ release-agno-agentic-platform-starter-ui   Service     ClusterIP  Frontend
 The chart is published to GHCR. You can install directly without cloning the repo:
 
 ```bash
-helm upgrade --install agno oci://ghcr.io/bruceherve/agno-agentos-starter \
+helm upgrade --install agno oci://ghcr.io/bruceherve/agno-agentic-platform-starter \
   --version 0.1.0 \
   --set image.repository=ghcr.io/your-org/agno-agentic-platform-starter \
   --set image.tag=latest \
