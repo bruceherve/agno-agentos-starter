@@ -1,6 +1,6 @@
 # Agno Agentic Platform Starter
 
-A self-hostable agentic platform built on [Agno AgentOS](https://github.com/agno-agi/agno) — open-source alternative to the gated dashboard at `os.agno.com`.
+A self-hostable agentic platform built on [Agno AgentOS](https://github.com/agno-agi/agno).
 
 This template gives you a production-ready AgentOS backend and a dashboard UI to manage and observe your agents, all in a single repository.
 
