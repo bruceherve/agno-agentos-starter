@@ -26,3 +26,7 @@
 {{- default "default" .Values.serviceAccount.name -}}
 {{- end -}}
 {{- end -}}
+
+{{- define "agno-agentos-starter.frontend-fullname" -}}
+{{- printf "%s-ui" (include "agno-agentos-starter.fullname" .) | trunc 63 | trimSuffix "-" -}}
+{{- end -}}

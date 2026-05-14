@@ -1,13 +1,34 @@
-1. Get the application URL by running these commands:
+Thank you for installing {{ .Chart.Name }}!
+
+── Backend (AgentOS API) ────────────────────────────────────────────────────
 {{- if .Values.ingress.enabled }}
-  export APP_HOST=$(kubectl get ingress {{ include "agno-agentos-starter.fullname" . }} -n {{ .Release.Namespace }} -o jsonpath='{.spec.rules[0].host}')
-  echo http://$APP_HOST/
+  API: http://{{ (index .Values.ingress.hosts 0).host }}/
 {{- else if contains "NodePort" .Values.service.type }}
-  export NODE_PORT=$(kubectl get service {{ include "agno-agentos-starter.fullname" . }} -n {{ .Release.Namespace }} -o jsonpath='{.spec.ports[0].nodePort}')
+  export NODE_PORT=$(kubectl get svc {{ include "agno-agentos-starter.fullname" . }} -n {{ .Release.Namespace }} -o jsonpath='{.spec.ports[0].nodePort}')
   export NODE_IP=$(kubectl get nodes -n {{ .Release.Namespace }} -o jsonpath='{.items[0].status.addresses[0].address}')
-  echo http://$NODE_IP:$NODE_PORT
+  API: http://$NODE_IP:$NODE_PORT
 {{- else if contains "LoadBalancer" .Values.service.type }}
-    echo "Wait for the load balancer IP to be assigned, then use kubectl get svc {{ include "agno-agentos-starter.fullname" . }} -n {{ .Release.Namespace }}"
+  API: Run: kubectl get svc {{ include "agno-agentos-starter.fullname" . }} -n {{ .Release.Namespace }}
 {{- else }}
-    echo "Use kubectl port-forward svc/{{ include "agno-agentos-starter.fullname" . }} 8000:{{ .Values.service.port }} -n {{ .Release.Namespace }}"
+  API port-forward: kubectl port-forward svc/{{ include "agno-agentos-starter.fullname" . }} 8000:{{ .Values.service.port }} -n {{ .Release.Namespace }}
+{{- end }}
+
+{{- if .Values.frontend.enabled }}
+
+── Frontend (Next.js UI) ────────────────────────────────────────────────────
+{{- if .Values.frontend.ingress.enabled }}
+  UI: http://{{ (index .Values.frontend.ingress.hosts 0).host }}/
+{{- else if contains "NodePort" .Values.frontend.service.type }}
+  export UI_PORT=$(kubectl get svc {{ include "agno-agentos-starter.frontend-fullname" . }} -n {{ .Release.Namespace }} -o jsonpath='{.spec.ports[0].nodePort}')
+  export NODE_IP=$(kubectl get nodes -n {{ .Release.Namespace }} -o jsonpath='{.items[0].status.addresses[0].address}')
+  UI: http://$NODE_IP:$UI_PORT
+{{- else if contains "LoadBalancer" .Values.frontend.service.type }}
+  UI: Run: kubectl get svc {{ include "agno-agentos-starter.frontend-fullname" . }} -n {{ .Release.Namespace }}
+{{- else }}
+  UI port-forward:  kubectl port-forward svc/{{ include "agno-agentos-starter.frontend-fullname" . }} 3000:{{ .Values.frontend.service.port }} -n {{ .Release.Namespace }}
+{{- end }}
+
+  NOTE: The UI proxies /api/* to the backend via Next.js rewrites.
+  API_URL in frontend.env must point to the backend service within the cluster.
+  Current value: {{ .Values.frontend.env.API_URL }}
 {{- end }}

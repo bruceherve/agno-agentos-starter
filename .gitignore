@@ -4,3 +4,10 @@ __pycache__/
 .env
 app/.env
 .DS_Store
+
+# Local working files — not for commits
+notes.md
+memory.md
+inspiration-*.png
+separator.png
+agno-full-ui.png

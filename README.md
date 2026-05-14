@@ -1,165 +1,200 @@
-# Agno AgentOS Starter
+# Agno Agentic Platform Starter
 
-This repository is a clean starter template for building an Agno AgentOS backend that can be connected to the hosted AgentOS UI at `os.agno.com`.
+A self-hostable, full-stack starter for [Agno AgentOS](https://github.com/agno-agi/agno) — open-source alternative to the gated dashboard at `os.agno.com`.
 
-It is adapted from the upstream `agentos-railway-template`:
+This template gives you a production-ready AgentOS backend and a fully featured Next.js dashboard UI in a single repository, deployable to Kubernetes via Helm.
 
-- https://github.com/agno-agi/agentos-railway-template
+## What's included
 
-This starter keeps the reusable AgentOS backend structure, but strips away the deployment and workflow choices that were specific to that template. In particular, this repo removes Railway provisioning, Docker Compose, eval scaffolding, Claude-specific repo docs and prompts, Slack wiring, and project-specific example agents so the result stays generic and reusable as a public starter.
+**Backend** — FastAPI + Agno AgentOS (`app/`)
 
-It keeps the backend generic and reusable:
+- One starter agent with agentic memory, session history, and tool support
+- AG-UI streaming interface for real-time chat
+- PostgreSQL + pgvector via a single `DB_URI`
+- Tracing, scheduler, and human-in-the-loop approvals enabled by default
+- Clean agent registry for adding more agents
 
-- FastAPI app exposed through Agno AgentOS.
-- PostgreSQL configured via a single `DB_URI`.
-- One simple starter agent plus a clean registry pattern for adding more.
-- Docker image build support.
-- Helm chart skeleton for Kubernetes deployment.
+**Frontend dashboard** — Next.js 16 + Tailwind CSS (`ui/`)
+
+| Page | What it does |
+|---|---|
+| Chat | Streaming conversation with the agent via AG-UI/SSE |
+| Sessions | Paginated session list, inline history, delete |
+| Memory | Agentic memory viewer, topic filter, search, optimize |
+| Metrics | Token usage, run counts, date-range charts |
+| Workflows | Workflow list, step tree, input schema |
+| Approvals | Human-in-the-loop queue, approve/reject with reason |
+| Schedules | Schedule list, enable/disable, manual trigger |
+| Traces | Execution trace viewer with nested span tree |
+| Teams | Agent team cards, click to start a chat |
+| Settings | Live config overview — agents, models, feature flags |
 
 ## Repository layout
 
-```text
-app/
-agents/
-db/
-charts/agno-agentos-starter/
+```
+app/                          FastAPI + AgentOS entrypoint
+agents/                       Agent definitions and registry
+db/                           Postgres session and knowledge helpers
+ui/                           Next.js dashboard (full frontend)
+  app/                        Next.js App Router pages
+  components/                 Sidebar, header, shadcn primitives
+  lib/api.ts                  Fetch wrapper + AG-UI SSE client
+  next.config.ts              /api/* rewrite proxy → backend
+charts/agno-agentos-starter/  Helm chart (backend + frontend)
+Dockerfile                    Backend Docker image
+ui/Dockerfile                 Frontend Docker image
 pyproject.toml
-Dockerfile
-.dockerignore
-README.md
 example.env
 ```
 
-## Install and use
+## Local development
 
-### 0. Install `uv`
+### Prerequisites
 
-If you plan to use the local Python workflow in this repo, install `uv` first:
+- `uv` (Python package manager)
+- Node.js 20+
+- A reachable PostgreSQL database (or Neon)
+- An API key for your model provider
 
-```bash
-curl -LsSf https://astral.sh/uv/install.sh | sh
-```
-
-This starter includes a committed `uv.lock`, so the expected local setup flow is `uv sync` from the repo root.
-
-If you only plan to build and run the Docker image, `uv` is not required on the host.
-
-### 1. Clone the repository
+### 1. Clone
 
 ```bash
-git clone <your-repo-url> agno-agentos-starter
+git clone https://github.com/bruceherve/agno-agentos-starter
 cd agno-agentos-starter
 ```
 
-### 2. Create a `.env` file
-
-Start from the example file:
+### 2. Configure the backend
 
 ```bash
 cp example.env .env
 ```
 
-At minimum, set these two values:
-
-- `MODEL_API_KEY` for the model provider configured in code.
-- `DB_URI` for your database connection.
-
-Example:
+Edit `.env` with at minimum:
 
 ```env
 MODEL_API_KEY=your-api-key
 DB_URI=postgresql+psycopg://user:password@localhost:5432/agentos
 ```
 
-The model provider and model ID are configured in code, not in `.env`. The environment file only carries credentials and runtime connection data. In production, the same values should normally come from Kubernetes or your platform secret store rather than a committed env file.
-
-By default, this starter runs with `RUNTIME_ENV=dev`, so AgentOS token-based authorization is disabled for local development. When you switch to `RUNTIME_ENV=prd`, authorization is enabled by default. In that mode, `JWT_VERIFICATION_KEY` must be set or the app will refuse to serve production traffic.
-
-Postgres is the only real infrastructure dependency assumed by this starter because the included knowledge helper uses `pgvector`. Agno supports other storage patterns and backends as well, so if you want to change that layer, check the Agno storage and database documentation before extending `db/session.py`.
-
-If you want a Postgres-compatible alternative to vanilla Postgres, Neon also fits this starter because Agno supports Neon through the same `PostgresDb` path. In practice, that means you can point `DB_URI` at a Neon Postgres connection string and keep the rest of this starter unchanged.
-
-### 3. Run locally with Python
-
-Prerequisites:
-
-- `uv`
-- Python 3.12+
-- A reachable database for `DB_URI`
-
-Create the local environment and install the locked dependencies:
+### 3. Run the backend
 
 ```bash
 uv sync
-```
-
-Start the AgentOS backend:
-
-```bash
 uv run python -m uvicorn app.main:app --host 0.0.0.0 --port 8000 --reload
 ```
 
-Then connect from the hosted UI:
+Backend runs on `http://localhost:8000`. Health check: `GET /health`.
 
-- Open `https://os.agno.com`
-- Add a new OS connection
-- Point it at your running backend URL, for example `http://localhost:8000`
+### 4. Run the frontend
 
-### 4. Build and run with Docker
+```bash
+cd ui
+npm install
+npm run dev
+```
 
-Build the image:
+Frontend runs on `http://localhost:3000`. All `/api/*` requests are proxied to the backend via Next.js rewrites — no CORS configuration needed.
+
+The frontend reads `API_URL` from `ui/.env.local` (already set to `http://localhost:8000`). This is a server-side variable used by the Next.js rewrite proxy, so it works correctly at runtime without being baked into the client bundle.
+
+## Docker
+
+Two separate images — one per process.
+
+**Backend:**
 
 ```bash
 docker build -t agno-agentos-starter:latest .
-```
-
-Run it:
-
-```bash
 docker run --rm -p 8000:8000 --env-file .env agno-agentos-starter:latest
 ```
 
-### 5. Deploy with Helm
-
-The chart in `charts/agno-agentos-starter` supports:
-
-- image repository and tag
-- plain env vars
-- secrets
-- service configuration
-- ingress configuration
-- resources
-- liveness and readiness probes
-
-Example install:
+**Frontend:**
 
 ```bash
-helm upgrade --install agno-agentos-starter ./charts/agno-agentos-starter \
-  --set image.repository=ghcr.io/your-org/agno-agentos-starter \
-  --set image.tag=latest
+docker build -t agno-agentos-starter-ui:latest ./ui
+docker run --rm -p 3000:3000 \
+  -e API_URL=http://host.docker.internal:8000 \
+  agno-agentos-starter-ui:latest
 ```
+
+`API_URL` is injected at container runtime (not baked in at build time) because the frontend proxies API calls server-side through Next.js rewrites.
+
+## Kubernetes / Helm
+
+The chart in `charts/agno-agentos-starter` deploys both the backend and frontend as separate Kubernetes Deployments and Services.
+
+```
+release-agno-agentos-starter      Deployment  port 8000  FastAPI backend
+release-agno-agentos-starter      Service     ClusterIP  Backend
+release-agno-agentos-starter-ui   Deployment  port 3000  Next.js frontend
+release-agno-agentos-starter-ui   Service     ClusterIP  Frontend
+```
+
+### Install
+
+```bash
+helm upgrade --install agno ./charts/agno-agentos-starter \
+  --set image.repository=ghcr.io/your-org/agno-agentos-starter \
+  --set image.tag=latest \
+  --set frontend.image.repository=ghcr.io/your-org/agno-agentos-starter-ui \
+  --set frontend.image.tag=latest \
+  --set frontend.env.API_URL=http://agno-agno-agentos-starter:8000 \
+  --set secretEnv.MODEL_API_KEY=your-api-key \
+  --set secretEnv.DB_URI=postgresql+psycopg://user:password@db:5432/agentos
+```
+
+`frontend.env.API_URL` must point to the backend Service within the cluster. The pattern is `http://<release-name>-agno-agentos-starter:8000`.
+
+### Enable ingress
+
+```bash
+# Backend API
+--set ingress.enabled=true \
+--set ingress.hosts[0].host=api.yourdomain.com \
+
+# Frontend UI
+--set frontend.ingress.enabled=true \
+--set frontend.ingress.hosts[0].host=app.yourdomain.com
+```
+
+### Disable the frontend
+
+```bash
+--set frontend.enabled=false
+```
+
+This deploys the backend only — useful if you want to connect a different frontend or use the AgentOS API directly.
 
 ## Environment variables
 
-Only the variables used by this starter are documented here. The only required values for basic local use are `MODEL_API_KEY` and `DB_URI`.
+### Backend
 
 | Variable | Required | Default | Purpose |
 |---|---|---|---|
-| `MODEL_API_KEY` | yes | none | API key for whichever model provider is configured in `app/settings.py`. |
-| `DB_URI` | yes | none | SQLAlchemy-style PostgreSQL connection string. |
-| `RUNTIME_ENV` | no | `dev` | `dev` disables JWT auth for local development. `prd` enables AgentOS authorization. |
-| `AGENTOS_URL` | no | `http://127.0.0.1:8000` | Base URL used by the AgentOS scheduler. |
-| `PORT` | no | `8000` | Port for the API server. |
-| `JWT_VERIFICATION_KEY` | only in `prd` | none | Public verification key from `os.agno.com`. Required in production when `RUNTIME_ENV=prd`, otherwise the app will refuse to serve traffic. |
+| `MODEL_API_KEY` | yes | — | API key for the model provider configured in `app/settings.py` |
+| `DB_URI` | yes | — | SQLAlchemy PostgreSQL connection string (`postgresql+psycopg://...`) |
+| `RUNTIME_ENV` | no | `dev` | `dev` disables JWT auth. `prd` enables AgentOS authorization. |
+| `JWT_VERIFICATION_KEY` | prd only | — | Public key from `os.agno.com`. Required when `RUNTIME_ENV=prd`. |
+| `PORT` | no | `8000` | API server port. |
+
+### Frontend
+
+| Variable | Required | Default | Purpose |
+|---|---|---|---|
+| `API_URL` | no | `http://localhost:8000` | Backend URL used by the Next.js rewrite proxy. Set at container runtime. |
 
 ## Adding agents
 
-Add a new module under `agents/` and register it in `agents/registry.py`. Then add matching quick prompts under `app/config.yaml` using the agent `id` as the key.
+1. Add a new file under `agents/` following the pattern in `agents/starter_agent.py`.
+2. Register it in `agents/registry.py`.
+3. Restart the backend — the agent appears automatically in the dashboard.
 
-## Starter behavior
+## Model and database
 
-- AgentOS is exposed through FastAPI via `app/main.py`.
-- The default model choice lives in `app/settings.py`, not in environment variables.
-- Scheduler support is enabled.
-- Authorization is disabled by default in `dev` and enabled automatically when `RUNTIME_ENV=prd`.
-- The starter does not add a custom `/health` route to avoid colliding with AgentOS health handling.
+The model provider is configured in `app/settings.py`, not in environment variables. The default is `gpt-4.1-mini` via the OpenAI Responses API. To switch models or providers, edit `default_model()` in that file.
+
+PostgreSQL is the only required infrastructure dependency (used for sessions, memory, and vector knowledge). [Neon](https://neon.tech) works as a drop-in Postgres-compatible alternative — point `DB_URI` at a Neon connection string and everything else stays unchanged.
+
+## Production auth
+
+Set `RUNTIME_ENV=prd` to enable AgentOS JWT authorization. In that mode, `JWT_VERIFICATION_KEY` must be provided. Obtain this key from your `os.agno.com` account or your own JWT infrastructure.

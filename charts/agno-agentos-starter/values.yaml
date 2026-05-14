@@ -1,9 +1,6 @@
-replicaCount: 1
+# ── Shared ────────────────────────────────────────────────────────────────────
 
-image:
-  repository: agno-agentos-starter
-  pullPolicy: IfNotPresent
-  tag: latest
+replicaCount: 1
 
 serviceAccount:
   create: true
@@ -11,10 +8,19 @@ serviceAccount:
   name: ""
 
 podAnnotations: {}
-
 podSecurityContext: {}
-
 securityContext: {}
+
+nodeSelector: {}
+tolerations: []
+affinity: {}
+
+# ── Backend (FastAPI / AgentOS) ───────────────────────────────────────────────
+
+image:
+  repository: agno-agentos-starter
+  pullPolicy: IfNotPresent
+  tag: latest
 
 service:
   type: ClusterIP
@@ -25,7 +31,7 @@ ingress:
   className: ""
   annotations: {}
   hosts:
-    - host: agno-agentos-starter.local
+    - host: api.agno-agentos-starter.local
       paths:
         - path: /
           pathType: Prefix
@@ -33,7 +39,6 @@ ingress:
 
 env:
   RUNTIME_ENV: dev
-  AGENTOS_URL: http://127.0.0.1:8000
   PORT: "8000"
 
 secretEnv:
@@ -59,8 +64,51 @@ readinessProbe:
   initialDelaySeconds: 5
   periodSeconds: 10
 
-nodeSelector: {}
+# ── Frontend (Next.js UI) ─────────────────────────────────────────────────────
 
-tolerations: []
+frontend:
+  enabled: true
 
-affinity: {}
+  image:
+    repository: agno-agentos-starter-ui
+    pullPolicy: IfNotPresent
+    tag: latest
+
+  replicaCount: 1
+
+  service:
+    type: ClusterIP
+    port: 3000
+
+  ingress:
+    enabled: false
+    className: ""
+    annotations: {}
+    hosts:
+      - host: agno-agentos-starter.local
+        paths:
+          - path: /
+            pathType: Prefix
+    tls: []
+
+  # API_URL is read by the Next.js rewrite proxy at runtime (server-side).
+  # It should point to the backend service within the cluster.
+  # Pattern: http://<release-name>-agno-agentos-starter:8000
+  env:
+    API_URL: "http://agno-agentos-starter:8000"
+
+  resources: {}
+
+  livenessProbe:
+    httpGet:
+      path: /
+      port: 3000
+    initialDelaySeconds: 15
+    periodSeconds: 20
+
+  readinessProbe:
+    httpGet:
+      path: /
+      port: 3000
+    initialDelaySeconds: 10
+    periodSeconds: 10

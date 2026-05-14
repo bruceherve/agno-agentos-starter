@@ -1,0 +1,21 @@
+{{- if .Values.frontend.enabled -}}
+apiVersion: v1
+kind: Service
+metadata:
+  name: {{ include "agno-agentos-starter.frontend-fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "agno-agentos-starter.name" . }}-ui
+    helm.sh/chart: {{ include "agno-agentos-starter.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  type: {{ .Values.frontend.service.type }}
+  ports:
+    - port: {{ .Values.frontend.service.port }}
+      targetPort: http-ui
+      protocol: TCP
+      name: http-ui
+  selector:
+    app.kubernetes.io/name: {{ include "agno-agentos-starter.name" . }}-ui
+    app.kubernetes.io/instance: {{ .Release.Name }}
+{{- end }}
