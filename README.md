@@ -4,8 +4,7 @@ A self-hostable, full-stack starter for [Agno AgentOS](https://github.com/agno-a
 
 This template gives you a production-ready AgentOS backend and a fully featured Next.js dashboard UI in a single repository.
 
-> **No Docker required to get started.**
-> Two commands get you running locally — `uv run uvicorn ...` for the FastAPI backend and `npm run dev` for the Next.js frontend. Docker and Helm are available when you're ready to ship to production, but they're never required for development or learning.
+> **Runs locally with just `uv` and `npm`** — one command each for the FastAPI backend and the Next.js frontend. Docker is for those who want to package the platform into containers and deploy it to Kubernetes. It plays no role in local development, and it is not a requirement for running this in production either — a VM with `uv` and `npm` works just as well.
 
 ## What's included
 
