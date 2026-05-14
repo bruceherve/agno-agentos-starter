@@ -101,22 +101,34 @@ The frontend reads `API_URL` from `ui/.env.local` (already set to `http://localh
 
 ## Docker
 
-Two separate images — one per process.
+Both images are published to GHCR.
 
-**Backend:**
-
-```bash
-docker build -t agno-agentic-platform-starter:latest .
-docker run --rm -p 8000:8000 --env-file .env agno-agentic-platform-starter:latest
-```
-
-**Frontend:**
+**Pull and run:**
 
 ```bash
-docker build -t agno-agentic-platform-starter-ui:latest ./ui
+# Backend
+docker pull ghcr.io/bruceherve/agno-agentic-platform-starter:latest
+docker run --rm -p 8000:8000 --env-file .env ghcr.io/bruceherve/agno-agentic-platform-starter:latest
+
+# Frontend
+docker pull ghcr.io/bruceherve/agno-agentic-platform-starter-ui:latest
 docker run --rm -p 3000:3000 \
   -e API_URL=http://host.docker.internal:8000 \
-  agno-agentic-platform-starter-ui:latest
+  ghcr.io/bruceherve/agno-agentic-platform-starter-ui:latest
+```
+
+**Or build from source if you have cloned the repo:**
+
+```bash
+# Backend
+docker build -t ghcr.io/bruceherve/agno-agentic-platform-starter:latest .
+docker run --rm -p 8000:8000 --env-file .env ghcr.io/bruceherve/agno-agentic-platform-starter:latest
+
+# Frontend
+docker build -t ghcr.io/bruceherve/agno-agentic-platform-starter-ui:latest ./ui
+docker run --rm -p 3000:3000 \
+  -e API_URL=http://host.docker.internal:8000 \
+  ghcr.io/bruceherve/agno-agentic-platform-starter-ui:latest
 ```
 
 `API_URL` is injected at container runtime (not baked in at build time) because the frontend proxies API calls server-side through Next.js rewrites.
@@ -139,11 +151,11 @@ The chart is published to GHCR. You can install directly without cloning the rep
 ```bash
 helm upgrade --install agno oci://ghcr.io/bruceherve/agno-agentic-platform-starter \
   --version 0.1.0 \
-  --set image.repository=ghcr.io/your-org/agno-agentic-platform-starter \
+  --set image.repository=ghcr.io/bruceherve/agno-agentic-platform-starter \
   --set image.tag=latest \
-  --set frontend.image.repository=ghcr.io/your-org/agno-agentic-platform-starter-ui \
+  --set frontend.image.repository=ghcr.io/bruceherve/agno-agentic-platform-starter-ui \
   --set frontend.image.tag=latest \
-  --set frontend.env.API_URL=http://agno-agno-agentos-starter:8000 \
+  --set frontend.env.API_URL=http://agno-agno-agentic-platform-starter:8000 \
   --set secretEnv.MODEL_API_KEY=your-api-key \
   --set secretEnv.DB_URI=postgresql+psycopg://user:password@db:5432/agentos
 ```
@@ -152,9 +164,9 @@ Or from the local chart if you have cloned the repo:
 
 ```bash
 helm upgrade --install agno ./charts/agno-agentic-platform-starter \
-  --set image.repository=ghcr.io/your-org/agno-agentic-platform-starter \
+  --set image.repository=ghcr.io/bruceherve/agno-agentic-platform-starter \
   --set image.tag=latest \
-  --set frontend.image.repository=ghcr.io/your-org/agno-agentic-platform-starter-ui \
+  --set frontend.image.repository=ghcr.io/bruceherve/agno-agentic-platform-starter-ui \
   --set frontend.image.tag=latest \
   --set frontend.env.API_URL=http://agno-agno-agentic-platform-starter:8000 \
   --set secretEnv.MODEL_API_KEY=your-api-key \
