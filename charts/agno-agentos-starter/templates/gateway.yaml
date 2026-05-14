@@ -1,0 +1,15 @@
+{{- if .Values.gateway.enabled -}}
+apiVersion: gateway.networking.k8s.io/v1
+kind: Gateway
+metadata:
+  name: {{ include "agno-agentos-starter.fullname" . }}
+  labels:
+    app.kubernetes.io/name: {{ include "agno-agentos-starter.name" . }}
+    helm.sh/chart: {{ include "agno-agentos-starter.chart" . }}
+    app.kubernetes.io/instance: {{ .Release.Name }}
+    app.kubernetes.io/managed-by: {{ .Release.Service }}
+spec:
+  gatewayClassName: {{ .Values.gateway.gatewayClassName | quote }}
+  listeners:
+    {{- toYaml .Values.gateway.listeners | nindent 4 }}
+{{- end }}

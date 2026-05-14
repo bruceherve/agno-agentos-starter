@@ -112,3 +112,28 @@ frontend:
       port: 3000
     initialDelaySeconds: 10
     periodSeconds: 10
+
+# ── Gateway API (production Kubernetes) ───────────────────────────────────────
+# Requires Gateway API CRDs: https://gateway-api.sigs.k8s.io/
+# Use this instead of ingress.enabled / frontend.ingress.enabled.
+# Set gatewayClassName to match your controller (nginx, cilium, istio, envoy-gateway, traefik).
+
+gateway:
+  enabled: false
+  gatewayClassName: ""
+
+  listeners:
+    - name: http
+      port: 80
+      protocol: HTTP
+      allowedRoutes:
+        namespaces:
+          from: Same
+
+  backend:
+    hostnames:
+      - api.yourdomain.com
+
+  frontend:
+    hostnames:
+      - app.yourdomain.com
