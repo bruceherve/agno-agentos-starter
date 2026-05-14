@@ -365,7 +365,7 @@ export default function TracesPage() {
           <AnimatePresence initial={false}>
             {traces.map((trace, i) => {
               const badge = statusBadge(trace.status)
-              const isOpen = selectedId === trace.id
+              const isOpen = selectedId === trace.trace_id
 
               return (
                 <motion.div

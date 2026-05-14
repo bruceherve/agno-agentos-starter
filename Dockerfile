@@ -17,10 +17,11 @@ COPY pyproject.toml uv.lock ./
 RUN uv sync --frozen --no-dev --no-install-project
 
 # ── Source ────────────────────────────────────────────────────────────────────
+# PYTHONPATH=/app makes app/, agents/, db/ importable without installing
+# the project as a package — no second uv sync needed.
 COPY app ./app
 COPY agents ./agents
 COPY db ./db
-RUN uv sync --frozen --no-dev
 
 EXPOSE 8000
 
