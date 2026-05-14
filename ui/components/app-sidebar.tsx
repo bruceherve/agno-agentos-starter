@@ -51,8 +51,8 @@ const bottomItems = [
 ]
 
 const externalLinks = [
-  { label: "Docs",   href: "https://github.com/bruceherve/agno-agentos-starter#readme" },
-  { label: "GitHub", href: "https://github.com/bruceherve/agno-agentos-starter" },
+  { label: "Docs",   href: "https://github.com/bruceherve/agno-agent-platform-starter#readme" },
+  { label: "GitHub", href: "https://github.com/bruceherve/agno-agent-platform-starter" },
 ]
 
 function Divider() {
