@@ -159,6 +159,8 @@ helm upgrade --install agno ./charts/agno-agentic-platform-starter \
 --set frontend.ingress.hosts[0].host=app.yourdomain.com
 ```
 
+The chart ships with standard `networking.k8s.io/v1` Ingress for broad compatibility. For production Kubernetes clusters, the [Gateway API](https://gateway-api.sigs.k8s.io/) (`HTTPRoute`, `Gateway`, `GatewayClass`) is the recommended approach — it is now GA, better supported by modern ingress controllers (NGINX, Envoy, Istio, Cilium), and offers finer traffic management than the legacy Ingress resource. If your cluster supports Gateway API, replace the Ingress resources with `HTTPRoute` objects pointing at the backend and frontend Services.
+
 ### Disable the frontend
 
 ```bash
