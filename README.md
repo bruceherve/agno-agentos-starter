@@ -208,4 +208,4 @@ PostgreSQL is the only required infrastructure dependency (used for sessions, me
 
 ## Production auth
 
-Set `RUNTIME_ENV=prd` to enable AgentOS JWT authorization. In that mode, `JWT_VERIFICATION_KEY` must be provided. Obtain this key from your `os.agno.com` account or your own JWT infrastructure.
+Set `RUNTIME_ENV=prd` to enable AgentOS JWT authorization. In that mode, `JWT_VERIFICATION_KEY` must be provided. This should be the public verification key from your own JWT infrastructure — point it at your own domain and auth setup.
