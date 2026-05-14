@@ -14,7 +14,7 @@ This template gives you a production-ready AgentOS backend and a dashboard UI to
 - AG-UI streaming interface for real-time chat
 - PostgreSQL + pgvector via a single `DB_URI`
 - Tracing, scheduler, and human-in-the-loop approvals enabled by default
-- Clean agent registry for adding more agents
+- Simple agent registry (`agents/registry.py`) — a plain Python list, add an agent and restart
 
 **Frontend dashboard** — Next.js 16 + Tailwind CSS (`ui/`)
 
@@ -187,8 +187,17 @@ This deploys the backend only — useful if you want to connect a different fron
 
 ## Adding agents
 
-1. Add a new file under `agents/` following the pattern in `agents/starter_agent.py`.
-2. Register it in `agents/registry.py`.
+The "registry" is simply `agents/registry.py` — a single function that returns a list of agents:
+
+```python
+def get_agents() -> list[Agent]:
+    return [starter_agent]
+```
+
+AgentOS reads this list at startup and exposes each agent through the API and dashboard. To add a new agent:
+
+1. Create a new file under `agents/` following the pattern in `agents/starter_agent.py`.
+2. Import it in `agents/registry.py` and add it to the list.
 3. Restart the backend — the agent appears automatically in the dashboard.
 
 ## Model and database
