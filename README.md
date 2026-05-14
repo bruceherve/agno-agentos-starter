@@ -54,7 +54,7 @@ example.env
 ### Prerequisites
 
 - `uv` (Python package manager)
-- Node.js 20+
+- Node.js 24 LTS or later (always use an LTS release — even-numbered versions only)
 - A reachable PostgreSQL database (or Neon)
 - An API key for your model provider
 
