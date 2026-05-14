@@ -40,7 +40,7 @@ ui/                           Next.js dashboard (full frontend)
   components/                 Sidebar, header, shadcn primitives
   lib/api.ts                  Fetch wrapper + AG-UI SSE client
   next.config.ts              /api/* rewrite proxy → backend
-charts/agno-agent-platform-starter/  Helm chart (backend + frontend)
+charts/agno-agentic-platform-starter/  Helm chart (backend + frontend)
 Dockerfile                    Backend Docker image
 ui/Dockerfile                 Frontend Docker image
 pyproject.toml
@@ -59,8 +59,8 @@ example.env
 ### 1. Clone
 
 ```bash
-git clone https://github.com/bruceherve/agno-agent-platform-starter
-cd agno-agent-platform-starter
+git clone https://github.com/bruceherve/agno-agentic-platform-starter
+cd agno-agentic-platform-starter
 ```
 
 ### 2. Configure the backend
@@ -104,46 +104,46 @@ Two separate images — one per process.
 **Backend:**
 
 ```bash
-docker build -t agno-agent-platform-starter:latest .
-docker run --rm -p 8000:8000 --env-file .env agno-agent-platform-starter:latest
+docker build -t agno-agentic-platform-starter:latest .
+docker run --rm -p 8000:8000 --env-file .env agno-agentic-platform-starter:latest
 ```
 
 **Frontend:**
 
 ```bash
-docker build -t agno-agent-platform-starter-ui:latest ./ui
+docker build -t agno-agentic-platform-starter-ui:latest ./ui
 docker run --rm -p 3000:3000 \
   -e API_URL=http://host.docker.internal:8000 \
-  agno-agent-platform-starter-ui:latest
+  agno-agentic-platform-starter-ui:latest
 ```
 
 `API_URL` is injected at container runtime (not baked in at build time) because the frontend proxies API calls server-side through Next.js rewrites.
 
 ## Kubernetes / Helm
 
-The chart in `charts/agno-agent-platform-starter` deploys both the backend and frontend as separate Kubernetes Deployments and Services.
+The chart in `charts/agno-agentic-platform-starter` deploys both the backend and frontend as separate Kubernetes Deployments and Services.
 
 ```
-release-agno-agent-platform-starter      Deployment  port 8000  FastAPI backend
-release-agno-agent-platform-starter      Service     ClusterIP  Backend
-release-agno-agent-platform-starter-ui   Deployment  port 3000  Next.js frontend
-release-agno-agent-platform-starter-ui   Service     ClusterIP  Frontend
+release-agno-agentic-platform-starter      Deployment  port 8000  FastAPI backend
+release-agno-agentic-platform-starter      Service     ClusterIP  Backend
+release-agno-agentic-platform-starter-ui   Deployment  port 3000  Next.js frontend
+release-agno-agentic-platform-starter-ui   Service     ClusterIP  Frontend
 ```
 
 ### Install
 
 ```bash
-helm upgrade --install agno ./charts/agno-agent-platform-starter \
-  --set image.repository=ghcr.io/your-org/agno-agent-platform-starter \
+helm upgrade --install agno ./charts/agno-agentic-platform-starter \
+  --set image.repository=ghcr.io/your-org/agno-agentic-platform-starter \
   --set image.tag=latest \
-  --set frontend.image.repository=ghcr.io/your-org/agno-agent-platform-starter-ui \
+  --set frontend.image.repository=ghcr.io/your-org/agno-agentic-platform-starter-ui \
   --set frontend.image.tag=latest \
-  --set frontend.env.API_URL=http://agno-agno-agent-platform-starter:8000 \
+  --set frontend.env.API_URL=http://agno-agno-agentic-platform-starter:8000 \
   --set secretEnv.MODEL_API_KEY=your-api-key \
   --set secretEnv.DB_URI=postgresql+psycopg://user:password@db:5432/agentos
 ```
 
-`frontend.env.API_URL` must point to the backend Service within the cluster. The pattern is `http://<release-name>-agno-agent-platform-starter:8000`.
+`frontend.env.API_URL` must point to the backend Service within the cluster. The pattern is `http://<release-name>-agno-agentic-platform-starter:8000`.
 
 ### Enable ingress
 
