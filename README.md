@@ -1,8 +1,8 @@
 # Agno Agentic Platform Starter
 
-A self-hostable, full-stack starter for [Agno AgentOS](https://github.com/agno-agi/agno) — open-source alternative to the gated dashboard at `os.agno.com`.
+A self-hostable agentic platform built on [Agno AgentOS](https://github.com/agno-agi/agno) — open-source alternative to the gated dashboard at `os.agno.com`.
 
-This template gives you a production-ready AgentOS backend and a fully featured Next.js dashboard UI in a single repository.
+This template gives you a production-ready AgentOS backend and a dashboard UI to manage and observe your agents, all in a single repository.
 
 > **Runs locally with just `uv` and `npm`** — one command each for the FastAPI backend and the Next.js frontend. Docker is for those who want to package the platform into containers and deploy it to Kubernetes. It plays no role in local development, and it is not a requirement for running this in production either — a VM with `uv` and `npm` works just as well.
 
